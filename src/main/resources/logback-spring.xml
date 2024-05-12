@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration scan="true" scanPeriod="30 seconds">
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS, ${logback.timezone:-Asia/Seoul}} |%-5level| %-40.40logger{39}[%M : %L] / %msg%n</pattern>
+        </encoder>
+    </appender>
+
+
+    <appender name="FILE" class="ch.qos.logback.classic.sift.SiftingAppender">
+        <discriminator>
+            <key>fileName</key>
+            <defaultValue>ServerLog</defaultValue>
+        </discriminator>
+        <sift>
+            <appender name="MAIN_LOG-${fileName}" class="ch.qos.logback.core.rolling.RollingFileAppender">
+                <file>${user.dir}/logs/${fileName}.log</file>
+                <encoder>
+                    <charset>UTF-8</charset>
+                    <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS, ${logback.timezone:-Asia/Seoul}} |%-5level| %-40.40logger{39}[%M : %L] / %msg%n</pattern>
+                </encoder>
+                <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                    <fileNamePattern>${user.dir}/logs/%d{yyyy-MM-dd}/${fileName}/${fileName}.%i.log.zip
+                    </fileNamePattern>
+                    <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                        <maxFileSize>10MB</maxFileSize>
+                    </timeBasedFileNamingAndTriggeringPolicy>
+                    <timeBasedTriggeringPolicy class="ch.qos.logback.core.rolling.TimeBasedTriggeringPolicy">
+                        <interval>1</interval>
+                        <modulate>true</modulate>
+                    </timeBasedTriggeringPolicy>
+                    <maxHistory>7</maxHistory>
+                    <totalSizeCap>1GB</totalSizeCap>
+                </rollingPolicy>
+                <filter class="ch.qos.logback.classic.filter.LevelFilter">
+                    <level>INFO</level>
+                    <onMatch>ACCEPT</onMatch>
+                    <onMismatch>DENY</onMismatch>
+                </filter>
+            </appender>
+        </sift>
+    </appender>
+
+    <appender name="FILE_ERROR" class="ch.qos.logback.classic.sift.SiftingAppender">
+        <discriminator>
+            <key>fileName</key>
+            <defaultValue>ServerLog</defaultValue>
+        </discriminator>
+        <sift>
+            <appender name="ERROR_LOG-${fileName}" class="ch.qos.logback.core.rolling.RollingFileAppender">
+                <file>${user.dir}/logs/error_${fileName}.log</file>
+                <encoder>
+                    <charset>UTF-8</charset>
+                    <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS, ${logback.timezone:-Asia/Seoul}} |%-5level| %-40.40logger{39}[%M : %L] / %msg%n</pattern>
+                </encoder>
+                <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                    <fileNamePattern>${user.dir}/logs/%d{yyyy-MM-dd}/${fileName}/error_${fileName}.%i.log.zip
+                    </fileNamePattern>
+                    <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                        <maxFileSize>10MB</maxFileSize>
+                    </timeBasedFileNamingAndTriggeringPolicy>
+                    <timeBasedTriggeringPolicy class="ch.qos.logback.core.rolling.TimeBasedTriggeringPolicy">
+                        <interval>1</interval>
+                        <modulate>true</modulate>
+                    </timeBasedTriggeringPolicy>
+                    <maxHistory>7</maxHistory>
+                    <totalSizeCap>1GB</totalSizeCap>
+                </rollingPolicy>
+                <filter class="ch.qos.logback.classic.filter.LevelFilter">
+                    <level>ERROR</level>
+                    <onMatch>ACCEPT</onMatch>
+                    <onMismatch>DENY</onMismatch>
+                </filter>
+            </appender>
+        </sift>
+    </appender>
+
+
+    <!--INFO 레벨부터는 아래 설정으로 처리됨-->
+    <root level="INFO">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE"/>
+        <appender-ref ref="FILE_ERROR"/>
+    </root>
+
+</configuration>
